@@ -24,11 +24,11 @@ Sub RunMainframeScrape()
     vbsCode = vbsCode & "Dim objSess, objPS, objOIA, objFSO, objFile, r, txt, detail, rows, cols, clist, i, sName, regEx, lastRow, fRow, fCol" & vbCrLf
     vbsCode = vbsCode & "Set objFSO = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf
     vbsCode = vbsCode & "Set regEx = CreateObject(""VBScript.RegExp"")" & vbCrLf
-    vbsCode = vbsCode & "regEx.Global = True : regEx.Pattern = ""\s{2,}|\|""" & vbCrLf ' Pattern cleans double spaces AND internal pipes
+    vbsCode = vbsCode & "regEx.Global = True : regEx.Pattern = ""\s{2,}|\|""" & vbCrLf 
     
     vbsCode = vbsCode & "Set objFile = objFSO.CreateTextFile(""" & csvPath & """, True)" & vbCrLf
     
-    ' Connect to Session
+    ' Session Connection
     vbsCode = vbsCode & "Set clist = CreateObject(""PCOMM.autECLConnList"") : clist.Refresh" & vbCrLf
     vbsCode = vbsCode & "sName = """" : For i = 1 To clist.Count" & vbCrLf
     vbsCode = vbsCode & "  If InStr(1, clist(i).Name, ""BTS Pooled"", 1) > 0 Then sName = clist(i).Name : Exit For" & vbCrLf
@@ -47,25 +47,23 @@ Sub RunMainframeScrape()
     ' TABBING LOOP
     vbsCode = vbsCode & "  Do" & vbCrLf
     vbsCode = vbsCode & "    objPS.SendKeys ""[tab]""" & vbCrLf
-    vbsCode = vbsCode & "    WScript.Sleep 150" & vbCrLf 
+    vbsCode = vbsCode & "    WScript.Sleep 200" & vbCrLf 
     
     vbsCode = vbsCode & "    If objPS.CursorPosRow < 8 Or objPS.CursorPosRow > 22 Then Exit Do" & vbCrLf
     vbsCode = vbsCode & "    If objPS.CursorPosRow <= lastRow Then Exit Do" & vbCrLf
     vbsCode = vbsCode & "    lastRow = objPS.CursorPosRow : r = objPS.CursorPosRow" & vbCrLf
     
-    ' Scrape Main Row
     vbsCode = vbsCode & "    txt = Trim(objPS.GetText(r, 1, cols))" & vbCrLf
     
     ' --- DRILL DOWN ---
     vbsCode = vbsCode & "    objPS.SendKeys ""[pf2]""" & vbCrLf
-    vbsCode = vbsCode & "    WScript.Sleep 700" & vbCrLf 
+    vbsCode = vbsCode & "    WScript.Sleep 800" & vbCrLf 
     
-    ' Dynamic Search for "SPEC INS:"
     vbsCode = vbsCode & "    detail = ""None""" & vbCrLf
-    vbsCode = vbsCode & "    If objPS.SearchText(""SPEC INS:"", 1, 1, 1) Then" & vbCrLf
-    vbsCode = vbsCode & "       fRow = objPS.SearchTextRow : fCol = objPS.SearchTextCol + 9" & vbCrLf
+    vbsCode = vbsCode & "    fRow = 1 : fCol = 1" & vbCrLf ' Initial search position
+    vbsCode = vbsCode & "    If objPS.SearchText(""SPEC INS:"", 1, fRow, fCol) Then" & vbCrLf
+    vbsCode = vbsCode & "       fCol = fCol + 9" & vbCrLf 
     vbsCode = vbsCode & "       detail = """"" & vbCrLf
-    ' Grab the 4-row block
     vbsCode = vbsCode & "       For i = 0 To 3" & vbCrLf
     vbsCode = vbsCode & "          detail = detail & Trim(objPS.GetText(fRow + i, fCol, cols - fCol + 1)) & "" """ & vbCrLf
     vbsCode = vbsCode & "       Next" & vbCrLf
@@ -73,11 +71,11 @@ Sub RunMainframeScrape()
     vbsCode = vbsCode & "    End If" & vbCrLf
     
     vbsCode = vbsCode & "    objPS.SendKeys ""[pf11]""" & vbCrLf 
-    vbsCode = vbsCode & "    WScript.Sleep 700" & vbCrLf 
+    vbsCode = vbsCode & "    WScript.Sleep 800" & vbCrLf 
     
-    ' Clean up and Write
+    ' Cleanup & Write
     vbsCode = vbsCode & "    txt = regEx.Replace(txt, ""|"")" & vbCrLf
-    vbsCode = vbsCode & "    detail = Replace(detail, ""|"", "" "")" & vbCrLf ' Remove pipes from within detail
+    vbsCode = vbsCode & "    detail = Replace(detail, ""|"", "" "")" & vbCrLf
     vbsCode = vbsCode & "    objFile.WriteLine txt & ""|"" & detail" & vbCrLf
     vbsCode = vbsCode & "  Loop" & vbCrLf 
     
