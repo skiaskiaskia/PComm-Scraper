@@ -24,7 +24,7 @@ Sub RunMainframeScrape()
 
     ' --- BUILD THE VBSCRIPT ---
     vbsCode = "Option Explicit" & vbCrLf
-    vbsCode = vbsCode & "Dim objSess, objPS, objOIA, objFSO, objFile, r, txt, detail, buf, rows, cols, clist, i, sName, regEx, lastRow, exitLoop" & vbCrLf
+    vbsCode = vbsCode & "Dim objSess, objPS, objOIA, objFSO, objFile, r, txt, detail, buf, rows, cols, clist, i, sName, regEx, lastRow" & vbCrLf
     vbsCode = vbsCode & "Set objFSO = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf
     vbsCode = vbsCode & "Set regEx = CreateObject(""VBScript.RegExp"")" & vbCrLf
     vbsCode = vbsCode & "regEx.Global = True : regEx.Pattern = ""\s{2,}""" & vbCrLf
@@ -43,46 +43,43 @@ Sub RunMainframeScrape()
     ' MAIN PAGE LOOP
     vbsCode = vbsCode & "Do" & vbCrLf
     vbsCode = vbsCode & "  objOIA.WaitForInputReady" & vbCrLf
-    vbsCode = vbsCode & "  objPS.SetCursorPos 7, 80" & vbCrLf ' Start just above the data
+    vbsCode = vbsCode & "  objPS.SetCursorPos 7, 80" & vbCrLf 
     vbsCode = vbsCode & "  lastRow = 0" & vbCrLf
     
-    ' TABBING LOOP (Scans current page underscores)
+    ' TABBING LOOP
     vbsCode = vbsCode & "  Do" & vbCrLf
     vbsCode = vbsCode & "    objPS.SendKeys ""[tab]""" & vbCrLf
-    vbsCode = vbsCode & "    WScript.Sleep 150" & vbCrLf ' Sufficient time for cursor to move
+    vbsCode = vbsCode & "    WScript.Sleep 150" & vbCrLf 
     
-    ' Exit tab loop if cursor leaves the 8-22 range or jumps back to top
-    vbsCode = vbsCode & "    If objPS.CursorRow < 8 Or objPS.CursorRow > 22 Then Exit Do" & vbCrLf
-    vbsCode = vbsCode & "    If objPS.CursorRow <= lastRow Then Exit Do" & vbCrLf
+    ' FIX: Use CursorPosRow instead of CursorRow
+    vbsCode = vbsCode & "    If objPS.CursorPosRow < 8 Or objPS.CursorPosRow > 22 Then Exit Do" & vbCrLf
+    vbsCode = vbsCode & "    If objPS.CursorPosRow <= lastRow Then Exit Do" & vbCrLf
     
-    vbsCode = vbsCode & "    lastRow = objPS.CursorRow : r = objPS.CursorRow" & vbCrLf
+    vbsCode = vbsCode & "    lastRow = objPS.CursorPosRow : r = objPS.CursorPosRow" & vbCrLf
     vbsCode = vbsCode & "    txt = Trim(objPS.GetText(r, 1, cols))" & vbCrLf
     
-    ' --- DRILL DOWN DANCE ---
+    ' DRILL DOWN
     vbsCode = vbsCode & "    objPS.SendKeys ""[pf2]""" & vbCrLf
     vbsCode = vbsCode & "    WScript.Sleep 600" & vbCrLf 
-    ' Grab Detail (Change 5, 10, 20 to your specific field coordinates)
-    vbsCode = vbsCode & "    detail = Trim(objPS.GetText(5, 10, 20))" & vbCrLf 
+    vbsCode = vbsCode & "    detail = Trim(objPS.GetText(5, 10, 20))" & vbCrLf ' <--- Row 5, Col 10
     vbsCode = vbsCode & "    objPS.SendKeys ""[pf3]""" & vbCrLf
     vbsCode = vbsCode & "    WScript.Sleep 600" & vbCrLf 
     
-    ' Save to CSV
     vbsCode = vbsCode & "    txt = regEx.Replace(txt, ""|"")" & vbCrLf
     vbsCode = vbsCode & "    objFile.WriteLine txt & ""|"" & detail" & vbCrLf
-    vbsCode = vbsCode & "  Loop" & vbCrLf ' End Tab Loop
+    vbsCode = vbsCode & "  Loop" & vbCrLf 
     
-    ' --- TERMINATION CHECK ---
+    ' TERMINATION CHECK
     vbsCode = vbsCode & "  buf = UCase(objPS.GetText(1, 1, rows * cols))" & vbCrLf
-    ' If "Invalid" or "Last Page" appears anywhere, we are done
     vbsCode = vbsCode & "  If InStr(1, buf, ""INVALID"") > 0 Or InStr(1, buf, ""LAST PAGE"") > 0 Then Exit Do" & vbCrLf
     
-    ' Move to next page
+    ' Advance Page
     vbsCode = vbsCode & "  objPS.SendKeys ""[pa1]""" & vbCrLf
     vbsCode = vbsCode & "  WScript.Sleep 1000" & vbCrLf
     vbsCode = vbsCode & "Loop" & vbCrLf
     vbsCode = vbsCode & "objFile.Close"
 
-    ' --- EXECUTE ---
+    ' --- EXECUTION ---
     fso.CreateTextFile(vbsPath, True).Write vbsCode
     On Error Resume Next
     objShell.Run "C:\Windows\SysWOW64\wscript.exe """ & vbsPath & """", 1, True
