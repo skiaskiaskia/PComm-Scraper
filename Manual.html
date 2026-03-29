@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>[- BTS_REJECTION_SCRAPER_v1.0 -]</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.2;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 2px solid #0f0;
+            padding: 10px;
+            box-shadow: 0 0 15px #0f0;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px dashed #0f0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .ascii-art {
+            white-space: pre;
+            font-size: 10px;
+            margin-bottom: 10px;
+        }
+
+        h1, h2 {
+            text-transform: uppercase;
+            background-color: #0f0;
+            color: #000;
+            display: inline-block;
+            padding: 0 10px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #050;
+            padding: 15px;
+        }
+
+        .step-num {
+            font-weight: bold;
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .code-box {
+            background-color: #050505;
+            border: 1px inset #0f0;
+            padding: 10px;
+            color: #0c0;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .highlight { color: #fff; font-weight: bold; }
+        .comment { color: #080; font-style: italic; }
+
+        footer {
+            text-align: center;
+            font-size: 10px;
+            border-top: 2px dashed #0f0;
+            margin-top: 20px;
+            padding-top: 10px;
+        }
+
+        marquee {
+            background: #0f0;
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+<div class="ascii-art">
+  ____  _   _ _____ ____  _____ ____ _____ ___ ___  _   _ 
+ | __ )| | | | ____|  _ \| ____/ ___|_   _|_ _/ _ \| \ | |
+ |  _ \| | | |  _| | | | |  _| \___ \ | |  | | | | |  \| |
+ | |_) | |_| | |___| |_| | |___ ___) || |  | | |_| | |\  |
+ |____/ \___/|_____|____/|_____|____/ |_| |___\___/|_| \_|
+         [ REJECTION_SCRAPER // RELEASE v1.0 // 2026 ]
+</div>
+        <marquee scrollamount="5">--- INITIALIZING PCOMM_BRIDGE --- SYSTEM READY --- NO COGNITIVE DISSONANCE DETECTED ---</marquee>
+    </header>
+
+    <div class="section">
+        <h1>[01] USER_GUIDE.NFO</h1>
+        <p>This macro extracts <span class="highlight">RAW REJECTION DATA</span> from BTS without triggering IT alarms. Follow these steps to generate your dataset.</p>
+        
+        <p><span class="step-num">STEP_01:</span> Open your <span class="highlight">IBM PComm Session</span>. Navigate to the main rejection list (e.g., TFST or TREX).</p>
+        
+        <p><span class="step-num">STEP_02:</span> Open the Excel Workbook. Locate the <span class="highlight">Control Panel</span> at the top (Rows 1-4).</p>
+        
+        <p><span class="step-num">STEP_03:</span> Verify Speed Settings (ms):
+            <ul>
+                <li>B1 (Tab): 200</li>
+                <li>B2 (Drill): 850</li>
+                <li>B3 (Back): 850</li>
+                <li>B4 (Page): 1200</li>
+            </ul>
+        </p>
+
+        <p><span class="step-num">STEP_04:</span> Execute <span class="highlight">RunMainframeScrape</span>. A small bridge will initiate communication. <span class="highlight">DO NOT TOUCH THE KEYBOARD</span> while the bridge is active.</p>
+
+        <p><span class="step-num">STEP_05:</span> Once "Scrape Complete" appears, your raw data will be populated starting at <span class="highlight">Row 6</span>. Column A is the row, Column B contains the Special Instructions.</p>
+    </div>
+
+    <div class="section">
+        <h1>[02] CODE_ANATOMY.EXE</h1>
+        <p>Understanding the <span class="highlight">PCOMM_BRIDGE</span> architecture. This is how we bypass standard limitations.</p>
+
+        <h2>THE ANCHOR (RegEx)</h2>
+        <p>We don't hardcode rows. We use a pattern-seeking missile:</p>
+        <div class="code-box">
+            regEx.Pattern = "_ [A-Z]{3,4}" <br>
+            <span class="comment">// Finds the first underscore followed by 3-4 letters.</span><br>
+            <span class="comment">// This tells the script exactly where the data starts on ANY screen.</span>
+        </div>
+
+        <h2>THE DRILL-DOWN (Logic)</h2>
+        <p>The script "Deep-Dives" into each entry to find the rejection reason:</p>
+        <div class="code-box">
+            objPS.SendKeys "[pf2]" <span class="comment">' Enter the detail screen</span><br>
+            i = InStr(1, buf, "SPEC INS:", 1) <span class="comment">' Locate the label</span><br>
+            fRow = ... + 1 + 1 <span class="comment">' Shift 1 row DOWN to grab the text</span>
+        </div>
+
+        <h2>THE CIRCUIT BREAKER (Paging)</h2>
+        <p>How do we know when to stop? We compare the "Before" and "After" snapshots:</p>
+        <div class="code-box">
+            If buf = lastScreen Then Exit Do<br>
+            <span class="comment">// If the screen didn't change after pressing PA1, we've hit the end.</span>
+        </div>
+    </div>
+
+    <footer>
+        [SQUAD: BTS_AUTOMATION_GROUP] // [DATE: 03.28.2026] // [STATUS: 100% RAW]
+        <br>
+        "BECAUSE MANUAL ENTRY IS FOR MEATBAGS"
+    </footer>
+</div>
+
+</body>
+</html>
